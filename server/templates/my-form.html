@@ -1,0 +1,13 @@
+<div>
+    <form action = "{{ url_for('my_form_post') }}" method="POST">
+        <textarea rows="10" cols="120" name="text">{{ my_text }}</textarea>
+        <input  type="submit" value="black" name="black">
+        <input  type="submit" value="yapf" name="yapf"><br>
+    </form>
+    {% if black_text %}
+        <textarea rows="10" cols="120" name="black">{{ black_text }}</textarea>
+    {% endif %}
+    {% if yapf_text %}
+        <textarea rows="10" cols="120" name="yapf">{{ yapf_text }}</textarea>
+    {% endif %}
+</div>
