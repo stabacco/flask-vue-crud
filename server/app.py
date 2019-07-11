@@ -1,6 +1,6 @@
 import uuid
 
-from flask import Flask, jsonify, request
+from flask import Flask, jsonify, request, render_template
 from flask_cors import CORS
 
 
@@ -85,6 +85,38 @@ def single_book(book_id):
         response_object['message'] = 'Book removed!'
     return jsonify(response_object)
 
+@app.route('/')
+def my_form():
+    return render_template('my-form.html')
+
+@app.route('/black', methods=['POST'])
+def my_form_post():
+    text = request.form['text']
+    
+    print(request.form)
+    if 'black' in request.form:
+        import black
+        processed_text = black.format_str(text, mode=black.FileMode())
+        print(processed_text)
+        return render_template('my-form.html', my_text=text, black_text=processed_text)
+
+    elif 'yapf' in request.form:
+        from yapf.yapflib.yapf_api import FormatCode
+        processed_text = FormatCode(text, style_config='google')[0]
+        print(processed_text)
+        return render_template('my-form.html', my_text=text, yapf_text=processed_text)
+
+
+
+@app.route('/yapf', methods=['POST'])
+def yapf_post():
+    
+    text = request.form['text']
+    from yapf.yapflib.yapf_api import FormatCode
+    processed_text = FormatCode(text)
+    print(processed_text)
+    # processed_text = text.upper()
+    return render_template('my-form.html', my_text=text, yapf_text=processed_text)
 
 if __name__ == '__main__':
     app.run()
