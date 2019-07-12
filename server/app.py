@@ -92,7 +92,7 @@ def my_form():
 @app.route('/black', methods=['POST'])
 def my_form_post():
     text = request.form['text']
-    
+
     print(request.form)
     if 'black' in request.form:
         import black
