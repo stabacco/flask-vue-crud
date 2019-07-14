@@ -2,9 +2,27 @@ import black
 from fastapi import FastAPI, HTTPException
 from pydantic import BaseModel
 from enum import Enum
+from starlette.middleware.cors import CORSMiddleware
+from starlette.responses import JSONResponse
+
+import logging
+logging.basicConfig(level=logging.DEBUG)
 
 app = FastAPI(title="Python Formatter Api", description="python formatter")
 
+
+origins = [
+    "http://localhost",
+    "http://localhost:8080",
+]
+
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins='*',
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"],
+)
 
 @app.get("/")
 async def read_root():
@@ -46,6 +64,14 @@ def run_docformatter(code, **kwargs):
     return docformatter.format_code(code, **kwargs)
 
 
+@app.options('/items/')
+async def who_knows_why_i_need_this():
+    print('who knows what to do ')
+    headers = {"Access-Control-Allow-Origin": "*", 
+     'Access-Control-Allow-Headers': '*',
+    "Content-Language": "en-US"}
+    return JSONResponse(content={}, headers=headers)
+
 @app.post("/items/")
 async def create_item(item: FormattableCode):
     item_dict = item.dict()
@@ -53,7 +79,7 @@ async def create_item(item: FormattableCode):
     formatter = item_dict["formatter"]
     parameters = item_dict["parameters"]
 
-    print("paramteres", parameters)
+    print("code", code)
 
     # format with black
     if item_dict["formatter"] == "black":
@@ -75,9 +101,11 @@ async def create_item(item: FormattableCode):
 
     except Exception as e:
         raise HTTPException(
-            status_code=400, detail=str(e), headers={"X-Error": "formatter-error"}
+            status_code=400, detail=str(e), headers={"X-Error": "formatter-error", "Access-Control-Allow-Origin": "*",}
         )
-
+    headers = {"Access-Control-Allow-Origin": "*", 
+    "Content-Language": "en-US"}
+    return JSONResponse(content=item_dict, headers=headers)
     return item_dict
 
 
